@@ -20,11 +20,11 @@ function makeReading () {
             for (let sample3 = 0; sample3 <= sampleSize - 1; sample3++) {
                 Ntotal += pins.analogReadPin(AnalogPin.P2)
             }
-            Nave = Ntotal / sampleSize
-            Vscaled = Nave * (6 / 1023)
-            Vscaled = Math.round(Vscaled) * 100
-            Vscaled = Vscaled / 100
         }
+        Nave = Ntotal / sampleSize
+        Vscaled = Nave * (600 / 1023)
+        Vscaled = Math.round(Vscaled)
+        Vscaled = Vscaled / 100
         if (channel == 0) {
             Vreading = "" + convertToText(Vscaled) + ","
         } else if (channel == 1) {
