@@ -40,6 +40,7 @@ input.onButtonPressed(Button.A, function () {
     basic.showString(dateTime)
 })
 function setDate () {
+    serial.writeLine("start sd")
     // the first 2 characters after command
     date = stringIn.substr(2, 2)
     // the next 2 characters
@@ -68,6 +69,7 @@ input.onButtonPressed(Button.AB, function () {
     count = 0
 })
 function setTime () {
+    serial.writeLine("start st")
     // the first 2 characters after command
     hour = stringIn.substr(2, 2)
     // the next 2 characters command
@@ -103,22 +105,10 @@ input.onButtonPressed(Button.B, function () {
     makeReading()
     basic.showString(Vreading)
 })
-serial.onDataReceived(serial.delimiters(Delimiters.CarriageReturn), function () {
-    stringIn = serial.readUntil(serial.delimiters(Delimiters.CarriageReturn))
-    command = stringIn.substr(0, 2)
-    if (command == "st") {
-        setTime()
-    }
-    if (command == "sd") {
-        setDate()
-    }
-})
-let command = ""
 let minute = ""
 let hour = ""
 let year = ""
 let month = ""
-let stringIn = ""
 let Vreading = ""
 let Vscaled = 0
 let Nave = 0
@@ -130,6 +120,8 @@ let count = 0
 let dateTimeReadings: string[] = []
 let Vreadings: string[] = []
 let sampleSize = 0
+let stringIn = ""
+stringIn = ""
 sampleSize = 10
 let oneMinute = 60000
 Vreadings = []
@@ -156,4 +148,14 @@ loops.everyInterval(oneMinute, function () {
         `)
     basic.pause(50)
     basic.clearScreen()
+})
+basic.forever(function () {
+    stringIn = serial.readUntil(serial.delimiters(Delimiters.CarriageReturn))
+    if (stringIn.substr(0, 2).compare("st") == 0) {
+        setTime()
+        stringIn = ""
+    } else if (stringIn.substr(0, 2).compare("sd") == 0) {
+        setDate()
+        stringIn = ""
+    }
 })
