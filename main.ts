@@ -34,18 +34,10 @@ function makeReading () {
         }
     }
 }
-// Test block
+// Show date and time
 input.onButtonPressed(Button.A, function () {
-    if (count > 0) {
-        basic.showString("" + (dateTimeReadings[count - 1]))
-        basic.showString("" + (Vreadings[count - 1]))
-        basic.pause(1000)
-        basic.showNumber(count)
-        basic.pause(1000)
-        basic.clearScreen()
-    } else {
-        basic.showString("wait for reading")
-    }
+    readTime()
+    basic.showString(dateTime)
 })
 function setDate () {
     // the first 2 characters after command
@@ -63,6 +55,7 @@ function setDate () {
     DS3231.minute(),
     0
     )
+    basic.pause(100)
     serial.writeNumber(DS3231.date())
     serial.writeNumber(DS3231.month())
     serial.writeNumber(DS3231.year())
@@ -88,6 +81,7 @@ function setTime () {
     parseFloat(minute),
     0
     )
+    basic.pause(100)
     serial.writeNumber(DS3231.hour())
     serial.writeNumber(DS3231.minute())
     serial.writeLine("")
@@ -104,7 +98,7 @@ radio.onReceivedString(function (receivedString) {
         }
     }
 })
-// Instant PTH
+// Show ADC readings
 input.onButtonPressed(Button.B, function () {
     makeReading()
     basic.showString(Vreading)
