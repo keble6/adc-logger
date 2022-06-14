@@ -1,6 +1,6 @@
 function readTime () {
-    date = "" + DS3231.date() + "/" + DS3231.month() + "/" + DS3231.year()
-    time = "" + DS3231.hour() + ":" + DS3231.minute()
+    date = "" + leadingZero(DS3231.date()) + "/" + leadingZero(DS3231.month()) + "/" + DS3231.year()
+    time = "" + leadingZero(DS3231.hour()) + ":" + leadingZero(DS3231.minute())
     dateTime = "" + date + " " + time
 }
 function makeReading () {
@@ -34,6 +34,13 @@ function makeReading () {
         }
     }
 }
+function leadingZero (num: number) {
+    if (num < 10) {
+        return "0" + num
+    } else {
+        return convertToText(num)
+    }
+}
 // Show date and time
 input.onButtonPressed(Button.A, function () {
     readTime()
@@ -57,9 +64,10 @@ function setDate () {
     0
     )
     basic.pause(100)
-    serial.writeNumber(DS3231.date())
-    serial.writeNumber(DS3231.month())
-    serial.writeNumber(DS3231.year())
+    serial.writeLine("#date has been set")
+    serial.writeString("" + (leadingZero(parseFloat(date))))
+    serial.writeString("" + (leadingZero(parseFloat(month))))
+    serial.writeString(year)
     serial.writeLine("")
 }
 // Reset readings
@@ -69,7 +77,6 @@ input.onButtonPressed(Button.AB, function () {
     count = 0
 })
 function setTime () {
-    serial.writeLine("start st")
     // the first 2 characters after command
     hour = stringIn.substr(2, 2)
     // the next 2 characters command
@@ -84,8 +91,9 @@ function setTime () {
     0
     )
     basic.pause(100)
-    serial.writeNumber(DS3231.hour())
-    serial.writeNumber(DS3231.minute())
+    serial.writeLine("#time has been set")
+    serial.writeString("" + (leadingZero(parseFloat(hour))))
+    serial.writeString("" + (leadingZero(parseFloat(minute))))
     serial.writeLine("")
 }
 radio.onReceivedString(function (receivedString) {
