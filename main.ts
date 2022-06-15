@@ -47,7 +47,6 @@ input.onButtonPressed(Button.A, function () {
     basic.showString(dateTime)
 })
 function setDate () {
-    serial.writeLine("start sd")
     // the first 2 characters after command
     date = stringIn.substr(2, 2)
     // the next 2 characters
@@ -63,19 +62,21 @@ function setDate () {
     DS3231.minute(),
     0
     )
-    basic.pause(100)
-    serial.writeLine("#date has been set")
-    serial.writeString("" + (leadingZero(parseFloat(date))))
-    serial.writeString("" + (leadingZero(parseFloat(month))))
-    serial.writeString(year)
-    serial.writeLine("")
 }
-// Reset readings
-input.onButtonPressed(Button.AB, function () {
-    Vreadings = []
-    dateTimeReadings = []
-    count = 0
-})
+// Upload all readings
+function upload () {
+    // Debug
+    serial.writeLine("#count = " + count)
+    if (count > 0) {
+        basic.pause(100)
+        for (let index = 0; index <= count - 1; index++) {
+            serial.writeLine("" + dateTimeReadings[index] + ",")
+            basic.pause(100)
+            serial.writeLine("" + (Vreadings[index]))
+            basic.pause(100)
+        }
+    }
+}
 function setTime () {
     // the first 2 characters after command
     hour = stringIn.substr(2, 2)
@@ -90,45 +91,35 @@ function setTime () {
     parseFloat(minute),
     0
     )
-    basic.pause(100)
-    serial.writeLine("#time has been set")
-    serial.writeString("" + (leadingZero(parseFloat(hour))))
-    serial.writeString("" + (leadingZero(parseFloat(minute))))
-    serial.writeLine("")
 }
-radio.onReceivedString(function (receivedString) {
-    // Debug - radio received
-    serial.writeLine("radio received")
-    // Debug - radio received
-    serial.writeLine("count = " + count)
-    if (count > 0) {
-        basic.pause(2000)
-        for (let index = 0; index <= count - 1; index++) {
-            radio.sendString("" + dateTimeReadings[index] + ",")
-            serial.writeLine("" + dateTimeReadings[index] + ",")
-            radio.sendString("" + (Vreadings[index]))
-            serial.writeLine("" + (Vreadings[index]))
-            basic.pause(500)
-        }
-    }
-})
 // Show ADC readings
 input.onButtonPressed(Button.B, function () {
     makeReading()
     basic.showString(Vreading)
 })
-serial.onDataReceived(serial.delimiters(Delimiters.CarriageReturn), function () {
-    stringIn = serial.readUntil(serial.delimiters(Delimiters.CarriageReturn))
-    serial.writeString("Serial received " + stringIn)
-    serial.writeLine("")
-    if (stringIn.substr(0, 2).compare("st") == 0) {
+serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
+    stringIn = serial.readLine()
+    command = stringIn.substr(0, 2)
+    if (command.compare("st") == 0) {
         setTime()
-        stringIn = ""
-    } else if (stringIn.substr(0, 2).compare("sd") == 0) {
+        serial.writeLine("#time has been set")
+    } else if (command.compare("sd") == 0) {
         setDate()
-        stringIn = ""
+        serial.writeLine("#date has been set")
+    } else if (command.compare("rt") == 0) {
+        readTime()
+        serial.writeLine("#date/time = " + dateTime)
+    } else if (command.compare("up") == 0) {
+        upload()
+    } else if (command.compare("xx") == 0) {
+        serial.writeLine("#start xx")
+        Vreadings = []
+        dateTimeReadings = []
+        count = 0
+        serial.writeLine("#All readings deleted")
     }
 })
+let command = ""
 let minute = ""
 let hour = ""
 let year = ""
@@ -146,20 +137,18 @@ let Vreadings: string[] = []
 let sampleSize = 0
 let stringIn = ""
 serial.redirectToUSB()
+serial.setRxBufferSize(32)
+serial.setTxBufferSize(64)
 stringIn = ""
 sampleSize = 10
 let oneMinute = 60000
 Vreadings = []
 dateTimeReadings = []
 count = 0
-radio.setGroup(1)
-radio.setTransmitPower(7)
 loops.everyInterval(oneMinute, function () {
     // Take readings once per hour
     if (true) {
         let Vbat = 0
-        serial.writeString("minute = " + DS3231.minute())
-        serial.writeLine("")
         readTime()
         dateTimeReadings.push(dateTime)
         makeReading()
