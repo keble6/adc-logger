@@ -99,11 +99,15 @@ function setTime () {
 radio.onReceivedString(function (receivedString) {
     // Debug - radio received
     serial.writeLine("radio received")
+    // Debug - radio received
+    serial.writeLine("count = " + count)
     if (count > 0) {
         basic.pause(2000)
         for (let index = 0; index <= count - 1; index++) {
             radio.sendString("" + dateTimeReadings[index] + ",")
+            serial.writeLine("" + dateTimeReadings[index] + ",")
             radio.sendString("" + (Vreadings[index]))
+            serial.writeLine("" + (Vreadings[index]))
             basic.pause(500)
         }
     }
@@ -112,6 +116,18 @@ radio.onReceivedString(function (receivedString) {
 input.onButtonPressed(Button.B, function () {
     makeReading()
     basic.showString(Vreading)
+})
+serial.onDataReceived(serial.delimiters(Delimiters.CarriageReturn), function () {
+    stringIn = serial.readUntil(serial.delimiters(Delimiters.CarriageReturn))
+    serial.writeString("Serial received " + stringIn)
+    serial.writeLine("")
+    if (stringIn.substr(0, 2).compare("st") == 0) {
+        setTime()
+        stringIn = ""
+    } else if (stringIn.substr(0, 2).compare("sd") == 0) {
+        setDate()
+        stringIn = ""
+    }
 })
 let minute = ""
 let hour = ""
@@ -129,6 +145,7 @@ let dateTimeReadings: string[] = []
 let Vreadings: string[] = []
 let sampleSize = 0
 let stringIn = ""
+serial.redirectToUSB()
 stringIn = ""
 sampleSize = 10
 let oneMinute = 60000
@@ -139,8 +156,10 @@ radio.setGroup(1)
 radio.setTransmitPower(7)
 loops.everyInterval(oneMinute, function () {
     // Take readings once per hour
-    if (DS3231.minute() == 0) {
+    if (true) {
         let Vbat = 0
+        serial.writeString("minute = " + DS3231.minute())
+        serial.writeLine("")
         readTime()
         dateTimeReadings.push(dateTime)
         makeReading()
@@ -156,14 +175,4 @@ loops.everyInterval(oneMinute, function () {
         `)
     basic.pause(50)
     basic.clearScreen()
-})
-basic.forever(function () {
-    stringIn = serial.readUntil(serial.delimiters(Delimiters.CarriageReturn))
-    if (stringIn.substr(0, 2).compare("st") == 0) {
-        setTime()
-        stringIn = ""
-    } else if (stringIn.substr(0, 2).compare("sd") == 0) {
-        setDate()
-        stringIn = ""
-    }
 })
