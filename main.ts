@@ -147,7 +147,7 @@ dateTimeReadings = []
 count = 0
 loops.everyInterval(oneMinute, function () {
     // Take readings once per hour
-    if (true) {
+    if (DS3231.minute() == 0) {
         let Vbat = 0
         readTime()
         dateTimeReadings.push(dateTime)
