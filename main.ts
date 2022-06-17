@@ -1,3 +1,18 @@
+// This code reads the 3 ADC channels in sequence every hour.
+// The scaling assumes external resistors of 270k from input to microbit pins
+// and 330k from Pn to ground. So full scale is 6.0V. Other ratios require code change.
+// The ADC voltage reference is VDD (nominally 3.3V).
+// 
+// Measurements are stored as a date/time string followed by the 3 voltages, all comma separated.
+// Button usage:
+// A uploads stored readings to serial/USB
+// B displays voltage readings
+// Serial port commands
+// st+hhmm - sets time, e.g. st1306 for 6 minutes past 1 pm
+// sd+ddmmyyyy - sets date e.g. sd01122022 for 1 Dec 2022
+// rt - reads date time string to USB
+// up - uploads stored readings to USB
+// xx - deletes stored readings
 function readTime () {
     date = "" + leadingZero(DS3231.date()) + "/" + leadingZero(DS3231.month()) + "/" + DS3231.year()
     time = "" + leadingZero(DS3231.hour()) + ":" + leadingZero(DS3231.minute())
@@ -41,10 +56,9 @@ function leadingZero (num: number) {
         return convertToText(num)
     }
 }
-// Show date and time
+// Upload
 input.onButtonPressed(Button.A, function () {
-    readTime()
-    basic.showString(dateTime)
+    upload()
 })
 function setDate () {
     // the first 2 characters after command
