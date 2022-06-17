@@ -84,10 +84,10 @@ function upload () {
     if (count > 0) {
         basic.pause(100)
         for (let index = 0; index <= count - 1; index++) {
-            serial.writeLine("" + dateTimeReadings[index] + ",")
-            basic.pause(100)
+            serial.writeString("" + dateTimeReadings[index] + ",")
+            basic.pause(200)
             serial.writeLine("" + (Vreadings[index]))
-            basic.pause(100)
+            basic.pause(200)
         }
     }
 }
@@ -162,11 +162,10 @@ count = 0
 loops.everyInterval(oneMinute, function () {
     // Take readings once per hour
     if (DS3231.minute() == 0) {
-        let Vbat = 0
         readTime()
         dateTimeReadings.push(dateTime)
         makeReading()
-        Vreadings.push(convertToText(Vbat))
+        Vreadings.push(convertToText(Vreading))
         count += 1
     }
     basic.showLeds(`
