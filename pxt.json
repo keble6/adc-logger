@@ -5,7 +5,7 @@
         "core": "*",
         "microphone": "*",
         "pxt-DS3231": "github:keble6/pxt-ds3231#v1.0.2",
-        "pxt-ADS1115": "github:keble6/pxt-ADS1115#3a6affbed5ad20cd6d57521e6239cbdc25e4cc42"
+        "bluetooth": "*"
     },
     "files": [
         "main.blocks",
