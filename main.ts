@@ -19,34 +19,9 @@ function readTime () {
     dateTime = "" + date + " " + time
 }
 function makeReading () {
-    for (let channel = 0; channel <= 2; channel++) {
-        if (channel == 0) {
-            Ntotal = 0
-            for (let sample = 0; sample <= sampleSize - 1; sample++) {
-                Ntotal += pins.analogReadPin(AnalogPin.P0)
-            }
-        } else if (channel == 1) {
-            Ntotal = 0
-            for (let sample2 = 0; sample2 <= sampleSize - 1; sample2++) {
-                Ntotal += pins.analogReadPin(AnalogPin.P1)
-            }
-        } else {
-            Ntotal = 0
-            for (let sample3 = 0; sample3 <= sampleSize - 1; sample3++) {
-                Ntotal += pins.analogReadPin(AnalogPin.P2)
-            }
-        }
-        Nave = Ntotal / sampleSize
-        Vscaled = Nave * (600 / 1023)
-        Vscaled = Math.round(Vscaled)
-        Vscaled = Vscaled / 100
-        if (channel == 0) {
-            Vreading = "" + convertToText(Vscaled) + ","
-        } else if (channel == 1) {
-            Vreading = "" + Vreading + convertToText(Vscaled) + ","
-        } else {
-            Vreading = "" + Vreading + convertToText(Vscaled) + ","
-        }
+    for (let channel = 0; channel <= 3; channel++) {
+        let ADCreadings: number[] = []
+        ADCreadings[channel] = ADS1115.readADC(channel)
     }
 }
 function leadingZero (num: number) {
@@ -109,7 +84,7 @@ function setTime () {
 // Show ADC readings
 input.onButtonPressed(Button.B, function () {
     makeReading()
-    basic.showString(Vreading)
+    basic.showString("" + (Vreading))
 })
 serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
     stringIn = serial.readLine()
@@ -134,27 +109,23 @@ serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
     }
 })
 let command = ""
+let Vreading = 0
 let minute = ""
 let hour = ""
 let year = ""
 let month = ""
-let Vreading = ""
-let Vscaled = 0
-let Nave = 0
-let Ntotal = 0
 let dateTime = ""
 let time = ""
 let date = ""
 let count = 0
 let dateTimeReadings: string[] = []
 let Vreadings: string[] = []
-let sampleSize = 0
 let stringIn = ""
 serial.redirectToUSB()
 serial.setRxBufferSize(32)
 serial.setTxBufferSize(64)
 stringIn = ""
-sampleSize = 10
+let sampleSize = 10
 let oneMinute = 60000
 Vreadings = []
 dateTimeReadings = []
