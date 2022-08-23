@@ -121,9 +121,6 @@ let count = 0
 let dateTimeReadings: string[] = []
 let Vreadings: string[] = []
 let stringIn = ""
-serial.redirectToUSB()
-serial.setRxBufferSize(32)
-serial.setTxBufferSize(64)
 stringIn = ""
 let sampleSize = 10
 let oneMinute = 60000
