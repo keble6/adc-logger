@@ -7,7 +7,7 @@ function makeReading () {
     ADC0 = "" + convertToText(ADS1115.readADC(0)) + ","
     ADC1 = "" + convertToText(ADS1115.readADC(1)) + ","
     ADC2 = "" + convertToText(ADS1115.readADC(2)) + ","
-    ADC3 = "" + convertToText(ADS1115.readADC(3)) + ","
+    ADC3 = "" + convertToText(ADS1115.readADC(3)) + ""
 }
 function resetReadings () {
     Vreadings = []
@@ -48,6 +48,8 @@ function upload () {
             radio.sendString("" + (Vreadings1[index]))
             radio.sendString("" + (Vreadings2[index]))
             radio.sendString("" + (Vreadings3[index]))
+            // New line
+            radio.sendString(convertToText(10))
             basic.pause(500)
         }
     }
@@ -129,8 +131,8 @@ radio.setTransmitPower(7)
 serial.writeLine("#starting")
 ADS1115.setFSR(FSR.V4)
 loops.everyInterval(oneMinute, function () {
-    // Take readings once per hour
-    if (DS3231.minute() != 0) {
+    // Take readings every 15 minutes
+    if (DS3231.minute() % 15 == 0) {
         // Debug - make a reading
         serial.writeLine("#Making a reading")
         readTime()
