@@ -4,10 +4,10 @@ function readTime () {
     dateTime = "" + date + " " + time
 }
 function makeReading () {
-    for (let index = 0; index <= 3; index++) {
-        ADCreadings.push("" + ADS1115.readADC(index) + ",")
-    }
-    serial.writeLine("" + (ADCreadings))
+    ADC0 = "" + convertToText(ADS1115.readADC(0)) + ","
+    ADC1 = "" + convertToText(ADS1115.readADC(1)) + ","
+    ADC2 = "" + convertToText(ADS1115.readADC(2)) + ","
+    ADC3 = "" + convertToText(ADS1115.readADC(3)) + ","
 }
 function resetReadings () {
     Vreadings = []
@@ -44,7 +44,10 @@ function upload () {
         basic.pause(2000)
         for (let index = 0; index <= count - 1; index++) {
             radio.sendString("" + dateTimeReadings[index] + ",")
-            radio.sendString("" + (Vreadings[index]))
+            radio.sendString("" + (Vreadings0[index]))
+            radio.sendString("" + (Vreadings1[index]))
+            radio.sendString("" + (Vreadings2[index]))
+            radio.sendString("" + (Vreadings3[index]))
             basic.pause(500)
         }
     }
@@ -67,6 +70,7 @@ function setTime (num: number) {
 }
 // Instant Vreadings
 input.onButtonPressed(Button.B, function () {
+    let ADCreadings = 0
     makeReading()
     basic.showString("" + (ADCreadings))
 })
@@ -98,22 +102,31 @@ let hour = ""
 let year = ""
 let month = ""
 let stringIn = ""
+let Vreadings: number[] = []
+let ADC3 = ""
+let ADC2 = ""
+let ADC1 = ""
+let ADC0 = ""
 let dateTime = ""
 let time = ""
 let date = ""
 let count = 0
 let dateTimeReadings: string[] = []
-let Vreadings: string[][] = []
-let ADCreadings: string[] = []
+let Vreadings3: string[] = []
+let Vreadings2: string[] = []
+let Vreadings1: string[] = []
+let Vreadings0: string[] = []
 let oneMinute = 60000
-ADCreadings = []
-Vreadings = []
+Vreadings0 = []
+Vreadings1 = []
+Vreadings2 = []
+Vreadings3 = []
 dateTimeReadings = []
 count = 0
 radio.setGroup(1)
 radio.setTransmitPower(7)
 // Debug - start serial
-serial.writeLine("abc")
+serial.writeLine("#starting")
 ADS1115.setFSR(FSR.V4)
 loops.everyInterval(oneMinute, function () {
     // Take readings once per hour
@@ -123,7 +136,10 @@ loops.everyInterval(oneMinute, function () {
         readTime()
         dateTimeReadings.push(dateTime)
         makeReading()
-        Vreadings.push(ADCreadings)
+        Vreadings0.push(ADC0)
+        Vreadings1.push(ADC1)
+        Vreadings2.push(ADC2)
+        Vreadings3.push(ADC3)
         count += 1
     }
     led.plot(4, 0)
