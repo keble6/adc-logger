@@ -8,6 +8,10 @@ function makeReading () {
     ADC1 = "" + convertToText(ADS1115.readADC(1)) + ","
     ADC2 = "" + convertToText(ADS1115.readADC(2)) + ","
     ADC3 = "" + convertToText(ADS1115.readADC(3)) + ""
+    Vreadings0.push(ADC0)
+    Vreadings2.push(ADC2)
+    Vreadings3.push(ADC3)
+    Vreadings1.push(ADC1)
 }
 function resetReadings () {
     Vreadings = []
@@ -18,7 +22,7 @@ function resetReadings () {
 // Instant dateTime
 input.onButtonPressed(Button.A, function () {
     readTime()
-    basic.showString(dateTime)
+    basic.showString("" + (dateTime))
 })
 function setDate (num: number) {
     stringIn = convertToText(num)
@@ -72,9 +76,11 @@ function setTime (num: number) {
 }
 // Instant Vreadings
 input.onButtonPressed(Button.B, function () {
-    let ADCreadings = 0
     makeReading()
-    basic.showString("" + (ADCreadings))
+    basic.showString("" + (Vreadings0))
+    basic.showString("" + (Vreadings1))
+    basic.showString("" + (Vreadings2))
+    basic.showString("" + (Vreadings3))
 })
 radio.onReceivedValue(function (name, value) {
     if (name.compare("st") == 0) {
@@ -86,7 +92,7 @@ radio.onReceivedValue(function (name, value) {
     } else if (name.compare("rt") == 0) {
         readTime()
         serial.writeLine("#Reading dateTime")
-        radio.sendString(dateTime)
+        radio.sendString("" + (dateTime))
     } else if (name.compare("xx") == 0) {
         resetReadings()
         serial.writeLine("#Resetting readings")
@@ -99,20 +105,20 @@ radio.onReceivedValue(function (name, value) {
         serial.writeLine("#Uploading")
     }
 })
-let minute = ""
-let hour = ""
-let year = ""
-let month = ""
-let stringIn = ""
+let minute: string = []
+let hour: string = []
+let year: string = []
+let month: string = []
+let stringIn: string = []
 let Vreadings: number[] = []
-let ADC3 = ""
-let ADC2 = ""
-let ADC1 = ""
-let ADC0 = ""
-let dateTime = ""
-let time = ""
-let date = ""
-let count = 0
+let ADC3: string = []
+let ADC2: string = []
+let ADC1: string = []
+let ADC0: string = []
+let dateTime: string = []
+let time: string = []
+let date: string = []
+let count: number = []
 let dateTimeReadings: string[] = []
 let Vreadings3: string[] = []
 let Vreadings2: string[] = []
@@ -138,10 +144,6 @@ loops.everyInterval(oneMinute, function () {
         readTime()
         dateTimeReadings.push(dateTime)
         makeReading()
-        Vreadings0.push(ADC0)
-        Vreadings1.push(ADC1)
-        Vreadings2.push(ADC2)
-        Vreadings3.push(ADC3)
         count += 1
     }
     led.plot(4, 0)
